@@ -1,0 +1,17 @@
+#!/bin/bash
+
+drive=$(which drive)
+tmpfile=$(mktemp /tmp/drive.XXXXXX)
+$drive "$@" 2>$tmpfile
+code=$?
+stderr=$(sed -r 's!^( \| \r / \r – \r \\ \r)*( \| \r)?( / \r)?( – \r)?!!' $tmpfile)
+if [ -z "$stderr" ]; then
+  exit 0
+else
+  echo "$stderr" 1>&2
+  if [ $code -eq 0 ]; then
+    exit 1
+  else
+    exit $code
+  fi
+fi

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+meta_path="${0%/*}"
+
+function list_todo() {
+  diff --new-line-format="" --unchanged-line-format="" "$meta_path/list-todo.txt" "$meta_path/list-done.txt"
+}
+
+paths=$(list_todo)
+while [ "$paths" != "" ]; do
+  while read -r path; do
+    "$meta_path/drive" list -directories -depth 1 "$path" | sed "s!^!.!" >> "$meta_path/list-todo.txt"
+    if [ ${PIPESTATUS[0]} -eq 0 ]; then
+      echo "$path" >> "$meta_path/list-done.txt"
+    fi
+  done <<< "$paths"
+  [ "$paths" != "" ]
+  paths=$(list_todo)
+done

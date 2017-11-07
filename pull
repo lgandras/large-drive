@@ -1,0 +1,18 @@
+#!/bin/bash
+
+meta_path="${0%/*}"
+
+function pull_todo() {
+  diff --new-line-format="" --unchanged-line-format="" "$meta_path/list-done.txt" "$meta_path/pull-done.txt"
+}
+
+paths=$(pull_todo)
+while [ "$paths" != "" ]; do
+  while read -r path; do
+    drive pull -depth 2 -no-prompt "$path"
+    if [ $? -eq 0 ]; then
+      echo "$path" >> "$meta_path/pull-done.txt"
+    fi
+  done <<< "$paths"
+  paths=$(pull_todo)
+done

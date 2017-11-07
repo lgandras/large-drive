@@ -1,0 +1,23 @@
+#!/bin/bash
+
+meta_path="${0%/*}"
+
+function clashes_todo() {
+  diff --new-line-format="" --unchanged-line-format="" "$meta_path/list-done.txt" "$meta_path/clashes-done.txt"
+}
+
+paths=$(clashes_todo)
+while [ "$paths" != "" ]; do
+  while read -r path; do
+    stderr=$("$meta_path/drive" clashes -depth 2 "$path" 2>&1)
+    if [[ "$stderr" =~ ^These\ paths\ clash ]]; then
+      echo "$path" >> "$meta_path/clashes-done.txt"
+      sed -r "1d;s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g;s/^X //g" <<< "$stderr" >> "$meta_path/clashes-fix-todo.txt"
+    elif [[ "$stderr" =~ ^no\ clashes\ exist! ]]; then
+      echo "$path" >> "$meta_path/clashes-done.txt"
+    else
+      echo $stderr >&2
+    fi
+  done <<< "$paths"
+  paths=$(clashes_todo)
+done

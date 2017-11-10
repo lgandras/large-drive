@@ -3,7 +3,7 @@
 meta_path="${0%/*}"
 
 function clashes_todo() {
-  diff --new-line-format="" --unchanged-line-format="" "$meta_path/list-done.txt" "$meta_path/clashes-done.txt"
+  diff --new-line-format="" --unchanged-line-format="" <(sort "$meta_path/list-done.txt") <(sort "$meta_path/clashes-done.txt")
 }
 
 paths=$(clashes_todo)

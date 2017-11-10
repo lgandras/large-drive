@@ -3,7 +3,7 @@
 meta_path="${0%/*}"
 
 function list_todo() {
-  diff --new-line-format="" --unchanged-line-format="" "$meta_path/list-todo.txt" "$meta_path/list-done.txt"
+  diff --new-line-format="" --unchanged-line-format="" <(sort "$meta_path/list-todo.txt") <(sort "$meta_path/list-done.txt")
 }
 
 paths=$(list_todo)
